@@ -1,4 +1,4 @@
-// Package zipfs provides an implementation of an http.FileSystem backed by the contents of a Zip file.
+// Package zipfs provides an implementation of an http.FileSystem backed by the contents of a zip archive.
 package zipfs
 
 import (
@@ -11,8 +11,7 @@ import (
 	"strings"
 )
 
-// ZipFileSystem is an implementation of http.FileSystem based on the contents of a zip file.
-type ZipFileSystem struct {
+type zipFileSystem struct {
 	files                map[string]*file
 	serveIndexForMissing bool
 }
@@ -22,8 +21,9 @@ type file struct {
 	fileInfo os.FileInfo
 }
 
-// NewEmbeddedZipFileSystem creates a new ZipFileSystem, while loading the zip content from the currently-running binary file itself.
-func NewEmbeddedZipFileSystem(setters ...Option) (*ZipFileSystem, error) {
+// NewEmbeddedZipFileSystem creates an http.FileSystem backed by the contents of a zip archive. It reads the zip archive content from the
+// currently-running binary file itself. It also accepts an optional list of options.
+func NewEmbeddedZipFileSystem(setters ...Option) (http.FileSystem, error) {
 	// Open ourselves and try to read
 	execPath, err := os.Executable()
 	if err != nil {
@@ -48,9 +48,10 @@ func NewEmbeddedZipFileSystem(setters ...Option) (*ZipFileSystem, error) {
 	return NewZipFileSystem(zr, setters...)
 }
 
-// NewZipFileSystem creates a new ZipFileSystem with the provided zip.Reader and options.
-func NewZipFileSystem(zr *zip.Reader, setters ...Option) (*ZipFileSystem, error) {
-	zipFS := &ZipFileSystem{
+// NewZipFileSystem creates an http.FileSystem backed by the contents of a zip archive (using from the provided *zip.Reader). It also
+// accepts an optional list of options.
+func NewZipFileSystem(zr *zip.Reader, setters ...Option) (http.FileSystem, error) {
+	zipFS := &zipFileSystem{
 		files: make(map[string]*file),
 	}
 
@@ -90,7 +91,7 @@ func NewZipFileSystem(zr *zip.Reader, setters ...Option) (*ZipFileSystem, error)
 }
 
 // Open finds and opens a given file by its name. It normalizes the file path by stripping the leading slash.
-func (z *ZipFileSystem) Open(name string) (http.File, error) {
+func (z *zipFileSystem) Open(name string) (http.File, error) {
 	// If we're opening the root (/), return a phony directory. This is to allow an index.html file in the root to work properly.
 	if name == "/" {
 		return &httpResource{
