@@ -22,6 +22,32 @@ type file struct {
 	fileInfo os.FileInfo
 }
 
+// NewEmbeddedZipFileSystem creates a new ZipFileSystem, while loading the zip content from the currently-running binary file itself.
+func NewEmbeddedZipFileSystem(setters ...Option) (*ZipFileSystem, error) {
+	// Open ourselves and try to read
+	execPath, err := os.Executable()
+	if err != nil {
+		return nil, fmt.Errorf("could not determine our executable path: %w", err)
+	}
+
+	f, err := os.Open(execPath)
+	if err != nil {
+		return nil, fmt.Errorf("could not open executable for reading: %w", err)
+	}
+
+	fi, err := f.Stat()
+	if err != nil {
+		return nil, fmt.Errorf("could not stat executable file: %w", err)
+	}
+
+	zr, err := zip.NewReader(f, fi.Size())
+	if err != nil {
+		return nil, fmt.Errorf("error reading embedded zip data: %w", err)
+	}
+
+	return NewZipFileSystem(zr, setters...)
+}
+
 // NewZipFileSystem creates a new ZipFileSystem with the provided zip.Reader and options.
 func NewZipFileSystem(zr *zip.Reader, setters ...Option) (*ZipFileSystem, error) {
 	zipFS := &ZipFileSystem{
