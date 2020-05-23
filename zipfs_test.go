@@ -8,7 +8,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/spectrumjade/zipfs"
+	"gerace.dev/zipfs"
 	"github.com/stretchr/testify/assert"
 )
 

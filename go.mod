@@ -1,4 +1,4 @@
-module github.com/spectrumjade/zipfs
+module gerace.dev/zipfs
 
 go 1.14
 
