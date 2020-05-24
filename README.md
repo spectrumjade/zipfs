@@ -1,3 +1,4 @@
+![Go](https://github.com/spectrumjade/zipfs/workflows/Go/badge.svg)
 # zipfs
 Package `zipfs` is an implementation of a Go `http.FileSystem`. Instead of serving files from a local filesystem directory, it serves the
 contents of a provided zip file. This might be useful to you if you have a Golang HTTP server (perhaps an API server) and would like to
