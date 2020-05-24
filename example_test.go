@@ -10,7 +10,7 @@ import (
 )
 
 func ExampleNewEmbeddedZipFileSystem() {
-	fs, err := zipfs.NewEmbeddedZipFileSystem(zipfs.ServeIndexForMissing())
+	fs, err := zipfs.NewEmbeddedZipFileSystem()
 	if err != nil {
 		log.Fatalf("Error setting up zipfs: %v", err)
 	}
